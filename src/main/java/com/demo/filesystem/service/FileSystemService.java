@@ -68,6 +68,17 @@ public class FileSystemService {
     public List<FileSystemResponseDTO> listByParentId(UUID parentId){
         List<Directory> directories = this.directoryService.listDirectoriesByParentId(parentId);
         List<File> files = this.fileService.listFilesByParentId(parentId);
+        return buildFileSystemResponse(directories, files);
+    }
+
+
+    public List<FileSystemResponseDTO> listRoot(){
+        List<Directory> rootDirectories = this.directoryService.listDirectoriesOnRoot();
+        List<File> rootFiles = this.fileService.listFilesOnRoot();
+        return buildFileSystemResponse(rootDirectories, rootFiles);
+    }
+
+    private List<FileSystemResponseDTO> buildFileSystemResponse(List<Directory> directories, List<File> files){
         List<FileSystemResponseDTO> responseDTOs = new ArrayList<>();
         List<FileSystemResponseDTO> directoryDTOs = directories.stream()
                 .map(directory -> {
@@ -81,41 +92,6 @@ public class FileSystemService {
                 .collect(Collectors.toList());
 
         List<FileSystemResponseDTO> fileDTOs = files.stream()
-                .map(file -> {
-                    FileSystemResponseDTO dto = new FileSystemResponseDTO();
-                    dto.setName(file.getName());
-                    dto.setCreatedDate(file.getCreatedDate());
-                    dto.setUpdatedDate(file.getUpdatedDate());
-                    dto.setType(FileSystemType.FILE);
-                    dto.setExtension(file.getExtension());
-                    dto.setSizeInBytes(file.getSizeInBytes());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
-        responseDTOs.addAll(directoryDTOs);
-        responseDTOs.addAll(fileDTOs);
-
-        return responseDTOs;
-    }
-
-
-    public List<FileSystemResponseDTO> listRoot(){
-        List<Directory> rootDirectories = this.directoryService.listDirectoriesOnRoot();
-        List<File> rootFiles = this.fileService.listFilesOnRoot();
-        List<FileSystemResponseDTO> responseDTOs = new ArrayList<>();
-        List<FileSystemResponseDTO> directoryDTOs = rootDirectories.stream()
-                .map(directory -> {
-                    FileSystemResponseDTO dto = new FileSystemResponseDTO();
-                    dto.setName(directory.getName());
-                    dto.setCreatedDate(directory.getCreatedDate());
-                    dto.setUpdatedDate(directory.getUpdatedDate());
-                    dto.setType(FileSystemType.FOLDER);
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
-        List<FileSystemResponseDTO> fileDTOs = rootFiles.stream()
                 .map(file -> {
                     FileSystemResponseDTO dto = new FileSystemResponseDTO();
                     dto.setName(file.getName());
