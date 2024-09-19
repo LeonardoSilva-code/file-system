@@ -1,16 +1,15 @@
 package com.demo.filesystem.service;
 
-import com.demo.filesystem.dto.CreateDirectoryDTO;
-import com.demo.filesystem.entity.Directory;
+import com.demo.filesystem.dto.CreateFileDTO;
 import com.demo.filesystem.entity.File;
 import com.demo.filesystem.exceptions.ApiError;
 import com.demo.filesystem.exceptions.AppException;
+import com.demo.filesystem.exceptions.FileNotFoundException;
 import com.demo.filesystem.exceptions.ResourceIntegrityException;
 import com.demo.filesystem.repository.FileRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -26,14 +25,14 @@ public class FileService {
         this.fileRepository = fileRepository;
     }
 
-    protected File createFile(CreateDirectoryDTO input) throws AppException {
+    protected File createFile(CreateFileDTO input) throws AppException {
         try {
             File fileToSave = new File();
             fileToSave.setName(input.getName());
             fileToSave.setCreatedDate(LocalDateTime.now());
             fileToSave.setUpdatedDate(LocalDateTime.now());
-            fileToSave.setExtension("png");
-            fileToSave.setSizeInBytes(new BigDecimal(10));
+            fileToSave.setExtension(input.getExtension());
+            fileToSave.setSizeInBytes(input.getSizeInBytes());
             return this.fileRepository.save(fileToSave);
         } catch (DataIntegrityViolationException e) {
             if(e.getMessage().contains(UniqueNameViolationErrorMesage))
@@ -42,11 +41,27 @@ public class FileService {
         }
     }
 
-    protected List<File> listDirectoriesByParentId(UUID parentId){
+    protected List<File> listFilesByParentId(UUID parentId){
         return this.fileRepository.findAllByDirectoyId(parentId);
     }
 
     protected List<File> listFilesOnRoot(){
         return this.fileRepository.findAllByDirectoyId(null);
+    }
+
+    protected File saveFile(File file){
+        return this.fileRepository.save(file);
+    }
+
+    protected File getById(UUID id) throws AppException{
+        try {
+            return this.fileRepository.getOne(id);
+        }catch (Exception e){
+            throw new FileNotFoundException("A file with the id: " + id + " was not found.");
+        }
+    }
+
+    protected void deleteFile(UUID fileId){
+       this.fileRepository.deleteById(fileId);
     }
 }

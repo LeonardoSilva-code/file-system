@@ -1,13 +1,16 @@
 package com.demo.filesystem.service;
 
 import com.demo.filesystem.dto.CreateDirectoryDTO;
+import com.demo.filesystem.dto.CreateFileDTO;
 import com.demo.filesystem.dto.FileSystemResponseDTO;
 import com.demo.filesystem.dto.FileSystemType;
 import com.demo.filesystem.entity.Directory;
 import com.demo.filesystem.entity.File;
 import com.demo.filesystem.exceptions.AppException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,13 +30,44 @@ public class FileSystemService {
         return this.directoryService.createDirectory(input);
     }
 
-    public File createFile(CreateDirectoryDTO input) throws AppException {
+    public File createFile(CreateFileDTO input) throws AppException {
         return this.fileService.createFile(input);
+    }
+
+    public Directory updateDirectory(CreateDirectoryDTO input, UUID directoryID) throws AppException {
+        Directory directory = this.directoryService.getById(directoryID);
+        directory.setName(input.getName());
+        directory.setParentDirectoyId(input.getParentId());
+        directory.setUpdatedDate(LocalDateTime.now());
+        return this.directoryService.saveDirectory(directory);
+    }
+
+    public File updateFile(CreateFileDTO input, UUID fileID) throws AppException {
+        File file = this.fileService.getById(fileID);
+        file.setName(input.getName());
+        file.setDirectoyId(input.getParentId());
+        file.setSizeInBytes(input.getSizeInBytes());
+        file.setExtension(input.getExtension());
+        file.setUpdatedDate(LocalDateTime.now());
+        return this.fileService.saveFile(file);
+    }
+
+    @Transactional
+    public void deleteDirectory(UUID directoryId){
+        List<File> childrenFiles = this.fileService.listFilesByParentId(directoryId);
+        if(!childrenFiles.isEmpty()){
+            childrenFiles.forEach(f -> this.deleteFile(f.getId()));
+        }
+        this.directoryService.deleteDirectory(directoryId);
+    }
+
+    public void deleteFile(UUID fileId){
+        this.fileService.deleteFile(fileId);
     }
 
     public List<FileSystemResponseDTO> listByParentId(UUID parentId){
         List<Directory> directories = this.directoryService.listDirectoriesByParentId(parentId);
-        List<File> files = this.fileService.listDirectoriesByParentId(parentId);
+        List<File> files = this.fileService.listFilesByParentId(parentId);
         List<FileSystemResponseDTO> responseDTOs = new ArrayList<>();
         List<FileSystemResponseDTO> directoryDTOs = directories.stream()
                 .map(directory -> {

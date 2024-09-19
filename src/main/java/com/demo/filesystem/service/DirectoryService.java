@@ -4,6 +4,7 @@ import com.demo.filesystem.dto.CreateDirectoryDTO;
 import com.demo.filesystem.entity.Directory;
 import com.demo.filesystem.exceptions.ApiError;
 import com.demo.filesystem.exceptions.AppException;
+import com.demo.filesystem.exceptions.DirectoryNotFoundException;
 import com.demo.filesystem.exceptions.ResourceIntegrityException;
 import com.demo.filesystem.repository.DirectoryRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,14 +37,17 @@ public class DirectoryService {
         }
     }
 
-    protected Directory getById(UUID id){
+    protected Directory saveDirectory(Directory directory){
+        return this.directoryRepository.save(directory);
+    }
+
+
+    protected Directory getById(UUID id) throws AppException{
         try {
             return this.directoryRepository.getOne(id);
         }catch (Exception e){
-            //TODO handle
-            System.out.println(e);
+            throw new DirectoryNotFoundException("A directory with the id: " + id + " was not found.");
         }
-        return null;
     }
 
     protected List<Directory> listDirectoriesByParentId(UUID parentId){
@@ -54,5 +58,12 @@ public class DirectoryService {
         return this.directoryRepository.findAllByParentDirectoyId(null);
     }
 
+    protected void deleteDirectory(UUID id){
+        List<Directory> childrenDirectories = this.listDirectoriesByParentId(id);
+        if(!childrenDirectories.isEmpty()){
+            this.directoryRepository.deleteAll(childrenDirectories);
+        }
+        this.directoryRepository.deleteById(id);
+    }
 
 }
