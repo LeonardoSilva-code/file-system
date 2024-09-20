@@ -1,9 +1,6 @@
 package com.demo.filesystem.service;
 
-import com.demo.filesystem.dto.CreateDirectoryDTO;
-import com.demo.filesystem.dto.CreateFileDTO;
-import com.demo.filesystem.dto.FileSystemResponseDTO;
-import com.demo.filesystem.dto.FileSystemType;
+import com.demo.filesystem.dto.*;
 import com.demo.filesystem.entity.Directory;
 import com.demo.filesystem.entity.File;
 import com.demo.filesystem.exceptions.AppException;
@@ -69,6 +66,27 @@ public class FileSystemService {
         List<Directory> directories = this.directoryService.listDirectoriesByParentId(parentId);
         List<File> files = this.fileService.listFilesByParentId(parentId);
         return buildFileSystemResponse(directories, files);
+    }
+
+    public  List<BreadcrumbResponseDTO> getBreadcrumbforDirectory(UUID directoryId) throws AppException {
+        List<BreadcrumbResponseDTO> breadcrumb = new ArrayList<>();
+        Directory currentDirectory = directoryService.getById(directoryId);
+
+        int position = 1;
+
+        while (currentDirectory != null) {
+            BreadcrumbResponseDTO breadcrumbDTO = new BreadcrumbResponseDTO();
+            breadcrumbDTO.setId(currentDirectory.getId().toString());
+            breadcrumbDTO.setName(currentDirectory.getName());
+            breadcrumbDTO.setPosition(position++);
+
+            breadcrumb.add(0, breadcrumbDTO);
+
+            UUID parentDirectoryId = currentDirectory.getParentDirectoyId();
+            currentDirectory = parentDirectoryId != null ? directoryService.getById(parentDirectoryId) : null;
+        }
+
+        return breadcrumb;
     }
 
 

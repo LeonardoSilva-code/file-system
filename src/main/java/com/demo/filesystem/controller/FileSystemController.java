@@ -1,6 +1,7 @@
 package com.demo.filesystem.controller;
 
 
+import com.demo.filesystem.dto.BreadcrumbResponseDTO;
 import com.demo.filesystem.dto.CreateDirectoryDTO;
 import com.demo.filesystem.dto.CreateFileDTO;
 import com.demo.filesystem.dto.FileSystemResponseDTO;
@@ -31,6 +32,11 @@ public class FileSystemController {
     @GetMapping("/directory/{directory_id}")
     public List<FileSystemResponseDTO> getRootDirectory(@PathVariable("directory_id") String directoryId){
         return this.fileSystemService.listByParentId(UUID.fromString(directoryId));
+    }
+
+    @GetMapping("/breadcrumb/{directory_id}")
+    public List<BreadcrumbResponseDTO> getBreadcrumbforDirectory(@PathVariable("directory_id") String directoryId) throws AppException {
+        return this.fileSystemService.getBreadcrumbforDirectory(UUID.fromString(directoryId));
     }
 
     @PostMapping("/directory")
