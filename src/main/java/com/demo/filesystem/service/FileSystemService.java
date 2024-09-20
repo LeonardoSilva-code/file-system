@@ -88,6 +88,7 @@ public class FileSystemService {
                     dto.setUpdatedDate(directory.getUpdatedDate());
                     dto.setType(FileSystemType.FOLDER);
                     dto.setId(directory.getId());
+                    dto.setParentId(directory.getParentDirectoyId());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -102,6 +103,7 @@ public class FileSystemService {
                     dto.setExtension(file.getExtension());
                     dto.setSizeInBytes(file.getSizeInBytes());
                     dto.setId(file.getId());
+                    dto.setParentId(file.getDirectoyId());
                     return dto;
                 })
                 .collect(Collectors.toList());

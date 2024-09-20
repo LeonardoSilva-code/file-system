@@ -14,6 +14,8 @@ import java.util.UUID;
 public class FileSystemResponseDTO {
 
     private UUID id;
+
+    private UUID parentId;
     private String name;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
