@@ -33,6 +33,7 @@ public class FileService {
             fileToSave.setUpdatedDate(LocalDateTime.now());
             fileToSave.setExtension(input.getExtension());
             fileToSave.setSizeInBytes(input.getSizeInBytes());
+            fileToSave.setDirectoyId(input.getParentId());
             return this.fileRepository.save(fileToSave);
         } catch (DataIntegrityViolationException e) {
             if(e.getMessage().contains(UniqueNameViolationErrorMesage))
