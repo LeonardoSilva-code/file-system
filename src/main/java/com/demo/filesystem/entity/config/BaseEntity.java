@@ -17,7 +17,6 @@ public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
-    @Column(unique=true)
     String name;
     @Column(name = "created_date", nullable = false, updatable = false)
     LocalDateTime createdDate;
