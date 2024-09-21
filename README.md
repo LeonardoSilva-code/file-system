@@ -49,11 +49,6 @@ Ou utilizando o wrapper do Maven que já vem no projeto:
 ```bash
   ./mvnw spring-boot:run
 ```
-Inicie o servidor
-
-```bash
-  npm run start
-```
 
 Acessar o sistema: O sistema será executado localmente no endereço:
 
